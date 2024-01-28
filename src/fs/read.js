@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -7,21 +7,23 @@ const __dirname = path.dirname(__filename);
 
 const read = async () => {
     const fileToRead = 'fileToRead.txt';
+    const filePathToRead = path.join(__dirname, 'files', fileToRead);
 
     try {
-        const filePathToRead = path.join(__dirname, 'files', fileToRead);
-
-        if (!fs.existsSync(filePathToRead)) {
-            throw new Error('File does not exist');
+        await fs.access(filePathToRead);
+        throw new Error('File does not exist');
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            throw new Error(`FS access operation failed: ${error.message}`);
         }
+    }
 
-        const fileContent = fs.readFileSync(filePathToRead, 'utf-8');
-
+    try {
+        const fileContent = await fs.readFile(filePathToRead, 'utf-8');
         console.log('File Content:');
         console.log(fileContent);
-
     } catch (error) {
-        throw new Error(`FS operation failed: ${error.message}`);
+        throw new Error(`FS read operation failed: ${error.message}`);
     }
 };
 

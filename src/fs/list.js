@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -9,20 +9,23 @@ const list = async () => {
     const folderPath = path.join(__dirname, 'files');
 
     try {
-        if (!fs.existsSync(folderPath)) {
-            throw new Error('Folder does not exist');
+        await fs.access(folderPath);
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            throw new Error(`FS access operation failed: ${error.message}`);
         }
+    }
 
-        const files = fs.readdirSync(folderPath);
+    try {
+        const files = await fs.readdir(folderPath);
 
         console.log('Filenames:');
 
         files.forEach((file) => {
             console.log(file);
         });
-
     } catch (error) {
-        throw new Error(`FS operation failed: ${error.message}`);
+        throw new Error(`FS read operation failed: ${error.message}`);
     }
 };
 
