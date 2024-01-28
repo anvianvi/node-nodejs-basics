@@ -1,5 +1,5 @@
-import fs from 'fs';
-import zlib from 'zlib';
+import { createReadStream, createWriteStream } from 'fs';
+import { createGunzip } from 'zlib';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -11,15 +11,16 @@ const decompress = async () => {
     const decompressedFile = path.join(__dirname, 'files', 'fileToCompress.txt');
 
     try {
-        const readStream = fs.createReadStream(compressedFile);
-        const unzipStream = zlib.createGunzip();
-        const writeStream = fs.createWriteStream(decompressedFile);
-
-        readStream.pipe(unzipStream).pipe(writeStream);
+        const readStream = createReadStream(compressedFile);
+        const unzipStream = createGunzip();
+        const writeStream = createWriteStream(decompressedFile);
 
         await new Promise((resolve, reject) => {
-            writeStream.on('finish', resolve);
-            writeStream.on('error', reject);
+            writeStream
+                .on('finish', resolve)
+                .on('error', reject);
+
+            readStream.pipe(unzipStream).pipe(writeStream);
         });
 
         console.log('File decompressed successfully.');

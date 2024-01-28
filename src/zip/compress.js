@@ -1,6 +1,5 @@
-
-import fs from 'fs';
-import zlib from 'zlib';
+import { createReadStream, createWriteStream } from 'fs';
+import { createGzip } from 'zlib';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -12,15 +11,16 @@ const compress = async () => {
     const compressedFile = path.join(__dirname, 'files', 'archive.gz');
 
     try {
-        const readStream = fs.createReadStream(fileToCompress);
-        const gzipStream = zlib.createGzip();
-        const writeStream = fs.createWriteStream(compressedFile);
-
-        readStream.pipe(gzipStream).pipe(writeStream);
+        const readStream = createReadStream(fileToCompress);
+        const gzipStream = createGzip();
+        const writeStream = createWriteStream(compressedFile);
 
         await new Promise((resolve, reject) => {
-            writeStream.on('finish', resolve);
-            writeStream.on('error', reject);
+            readStream
+                .pipe(gzipStream)
+                .pipe(writeStream)
+                .on('finish', resolve)
+                .on('error', reject);
         });
 
         console.log('File compressed successfully.');
