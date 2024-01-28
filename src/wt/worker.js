@@ -6,12 +6,11 @@ const sendResult = () => {
     try {
         parentPort.on('message', (n) => {
             const result = nthFibonacci(n);
-            parentPort.postMessage(result)
-        })
+            parentPort.postMessage(result);
+        });
     } catch (error) {
-        throw new Error(`FS operation failed: ${error.message}`);
+        throw new Error(`Worker operation failed: ${error.message}`);
     }
-
 };
 
 sendResult();

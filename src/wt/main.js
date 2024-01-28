@@ -1,4 +1,3 @@
-
 import { Worker } from 'worker_threads';
 import os from 'os';
 
@@ -8,32 +7,35 @@ const performCalculations = async () => {
     let startNumber = 10;
     const results = [];
 
-    for (let i = 0; i < numOfCores; i++) {
-        const workerPromise = new Promise((resolve) => {
-            const worker = new Worker(new URL('./worker.js', import.meta.url));
+    try {
+        const workerPromises = Array.from({ length: numOfCores }, (_, i) => {
+            return new Promise((resolve) => {
+                const worker = new Worker(new URL('./worker.js', import.meta.url));
 
-            worker.postMessage(startNumber);
-            startNumber++;
+                worker.postMessage(startNumber);
+                startNumber++;
 
-            worker.on('message', (result) => {
-                results[i] = { status: 'resolved', data: result };
-                resolve();
+                worker.on('message', (result) => {
+                    results[i] = { status: 'resolved', data: result };
+                    resolve();
+                });
+
+                worker.on('error', () => {
+                    results[i] = { status: 'error', data: null };
+                    resolve();
+                });
+
+                workers.push(worker);
             });
-
-            worker.on('error', (error) => {
-                results[i] = { status: 'error', data: null };
-                resolve();
-            });
-
-            workers.push(worker);
         });
 
-        await workerPromise;
+        await Promise.all(workerPromises);
+    } catch (error) {
+        console.error(`Main operation failed: ${error.message}`);
+    } finally {
+        await Promise.all(workers.map((worker) => worker.terminate()));
+        console.log(results);
     }
-
-    await Promise.all(workers.map((worker) => worker.terminate()));
-
-    console.log(results);
 };
 
 await performCalculations();
