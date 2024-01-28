@@ -7,10 +7,8 @@ const __dirname = path.dirname(__filename);
 const scriptPath = path.join(__dirname, 'files', 'script.js');
 
 const spawnChildProcess = async (args) => {
-    const childProcess = fork(scriptPath, args, { silent: true });
+    const childProcess = fork(scriptPath, args, { stdio: 'inherit' });
 
-    process.stdin.pipe(childProcess.stdin);
-    childProcess.stdout.pipe(process.stdout);
 };
 
 spawnChildProcess(['firstTestArg', 'secondTestArg', 1, 2, '2']);
