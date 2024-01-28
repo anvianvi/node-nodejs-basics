@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -15,16 +15,9 @@ const read = async () => {
             process.stdout.write(chunk);
         });
 
-        await new Promise((resolve) => {
-            readableStream.on('end', resolve);
-        });
-
-        console.log('\nFile reading completed.');
-
     } catch (error) {
         throw new Error(`FS operation failed: ${error.message}`);
     }
 };
 
 await read();
-
