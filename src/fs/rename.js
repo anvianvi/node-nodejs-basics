@@ -1,35 +1,16 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { __dirname } from '../helpers';
 
 const rename = async () => {
-    const currentFileName = 'wrongFilename.txt';
-    const newFileName = 'properFilename.md';
-    const currentFilePath = path.join(__dirname, 'files', currentFileName);
-    const newFilePath = path.join(__dirname, 'files', newFileName);
 
     try {
-        await fs.access(currentFilePath);
-        throw new Error('Source file does not exist');
-    } catch (error) {
-        if (error.code === 'ENOENT') {
-            throw new Error(`FS access operation failed: ${error.message}`);
-        }
-    }
+        const wrongFilePath = path.join(__dirname, 'files', 'wrongFilename.txt');
+        const properFilePath = path.join(__dirname, 'files', 'properFilename.md');
 
-    try {
-        await fs.access(newFilePath);
-        throw new Error('Destination file already exists');
+        await fs.rename(wrongFilePath, properFilePath);
     } catch (error) {
-        if (error.code === 'ENOENT') {
-            await fs.rename(currentFilePath, newFilePath);
-            console.log('File renamed successfully');
-        } else {
-            throw new Error(`FS access operation failed: ${error.message}`);
-        }
+        throw new Error(`FS access operation failed: ${error.message}`);
     }
 };
 
