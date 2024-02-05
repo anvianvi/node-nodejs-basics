@@ -1,6 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { __dirname } from '../helpers';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const create = async () => {
 

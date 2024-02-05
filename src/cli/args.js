@@ -1,16 +1,12 @@
 const parseArgs = () => {
-    const inputedArgsArray = process.argv.slice(2);
-    const parsedArgsArray = {};
+    const args = process.argv.slice(2);
 
-    for (let i = 0; i < inputedArgsArray.length; i += 2) {
-        const propName = inputedArgsArray[i].slice(2);
-        const propValue = inputedArgsArray[i + 1];
-        parsedArgsArray[propName] = propValue;
-    }
+    const result = args
+        .filter((_, index) => index % 2 === 0)
+        .map((name, index) => `${name.slice(2)} is ${args[index * 2 + 1]}`)
+        .join(`, `);
 
-    Object.entries(parsedArgsArray).forEach(([propName, propValue]) => {
-        console.log(`${propName} is ${propValue}`);
-    });
+    console.log(result)
 };
 
 parseArgs();

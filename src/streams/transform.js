@@ -1,26 +1,15 @@
-import { Transform, pipeline } from 'stream';
+import { Transform } from 'stream';
+import { pipeline } from 'stream/promises';
 
 const transform = async () => {
-    const reverse = new Transform({
-        transform(chunk, encoding, callback) {
-            const reversed = chunk.toString().split('').reverse().join('');
-            callback(null, reversed);
-        },
-    });
+    const reverseTransform = new Transform({
+        transform(chank, _, callback) {
+            const reversedText = chank.toString().split('').join('');
+            callback(null, `${reversedText}\n`)
+        }
+    })
 
-    try {
-        await new Promise((resolve, reject) => {
-            pipeline(process.stdin, reverse, process.stdout, (error) => {
-                if (error) {
-                    reject(new Error(`Pipeline failed: ${error.message}`));
-                } else {
-                    resolve();
-                }
-            });
-        });
-    } catch (error) {
-        throw new Error(`FS operation failed: ${error.message}`);
-    }
+    await pipeline(process.stdin, reverseTransform, process.stdout)
 };
 
 await transform();
